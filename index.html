@@ -47,16 +47,7 @@
     position: relative;
     overflow: hidden;
   }
-  #splash::before {
-    content: '';
-    position: absolute;
-    top: -60%;
-    left: -30%;
-    width: 160%;
-    height: 160%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    animation: float 8s ease-in-out infinite;
-  }
+  
   @keyframes float {
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(30px, -30px); }
@@ -96,7 +87,7 @@
   }
   .splash-model-img {
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto 24px;
     padding: 0;
     position: relative;
@@ -106,7 +97,7 @@
     box-sizing: border-box;
   }
   .splash-model-img img {
-    width: 100%;
+    width: 100%; max-width: 100%;
     height: auto;
     border-radius: 0;
     object-fit: contain;
@@ -564,11 +555,9 @@
     <p id="summaryText"></p>
   </div>
   <div class="dimension-cards" id="dimCards"></div>
-  </div>
-  </div>
   
-    <!-- 综合教练问题 -->
-    <div class="coach-section-wrap">
+  <!-- 综合教练问题 -->
+  <div class="coach-section-wrap">
       <div class="coach-section-header">
         <span class="coach-icon">🎯</span>
         <h3>深度思考：你的专属教练问题</h3>
