@@ -1,2 +1,5 @@
-# jingzhi-assessment
-晶智转型自测问卷 - AI-Powered Career Assessment
+# 晶智转型自测评估
+
+《人生转型》一书配套测评工具。
+
+> 上次更新：2026-04-10T01:57:13.486Z
