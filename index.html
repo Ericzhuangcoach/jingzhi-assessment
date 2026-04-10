@@ -575,7 +575,7 @@
       <div id="coachSection" class="coach-section-body"></div>
     </div>
 <div class="book-covers-row">
-    <img class="book-cover-promo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img3.png" alt="联合天畅">
+    <img class="book-cover-promo" src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img3.png" alt="联合天畅">
 </div>
 
 <!-- ==================== ALREADY DONE ==================== -->
@@ -770,7 +770,14 @@ function resetQuiz() {
   showPage('splash');
 }
 function startQuiz() {
-  if (hasDone()) { showPage('done'); return; }
+  if (hasDone()) {
+    try {
+      var saved = JSON.parse(localStorage.getItem('jztf_done') || '{}');
+      if (saved.answers) { window.answers = saved.answers; window._userBg = saved.userBg || ''; showResult(); return; }
+    } catch(e) {}
+    showPage('done');
+    return;
+  }
   const bgRadio = document.querySelector('input[name="userBg"]:checked');
   if (!bgRadio) {
     const area = document.querySelector('.bg-select-area');
