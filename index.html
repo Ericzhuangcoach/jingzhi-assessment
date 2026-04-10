@@ -503,14 +503,14 @@
 
 <!-- ==================== SPLASH PAGE ==================== -->
 <div id="splash" class="page active">
-  <div class="splash-model-img"><img src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img0.jpeg" alt="晶智转型模型"></div>
+  <div class="splash-model-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img0.jpeg" alt="晶智转型模型" class="model-img"></div>
   <div class="splash-badge">《人生转型》新书上市活动</div>
   <div class="splash-title">转型自我测评</div>
   <p class="splash-desc">
     本测评基于书中晶智转型模型而设计，涵盖意义构建、身心智慧、心智跃升、技能迭代、生态聚力、跨界创新六大维度，帮助你全面认识自己，并识别自己的转型优势与待发展领域。
   </p>
   <div class="bg-select-area">
-    <div class="bg-select-label" id="bgLabel">⚠️ 请先选择你的背景，再点击开始测评：</div>
+    <div class="bg-select-label" id="bgLabel">请选择你的背景，再点击「开始测评」</div><div id="bgTip" style="display:none;font-size:12px;color:#e74c3c;margin-top:4px;">⚠️ 请先选择背景，再点击开始测评</div>
     <div class="bg-options">
       <label class="bg-opt"><input type="radio" name="userBg" value="正在寻找新工作中"><span>A、正在寻找新工作中</span></label>
       <label class="bg-opt"><input type="radio" name="userBg" value="创业转型中"><span>B、创业转型中</span></label>
@@ -576,10 +576,10 @@
     </div>
 <div class="book-covers-row">
     <div class="book-covers-top">
-        <img class="book-cover-small lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img1.png" alt="《人生转型》书封">
-        <img class="book-cover-small lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img2.jpeg" alt="作者列表">
+        <img class="book-cover-small" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img1.png" alt="《人生转型》书封">
+        <img class="book-cover-small" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img2.jpeg" alt="作者列表">
     </div>
-    <img class="book-cover-promo lazy-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img3.png" alt="联合天畅推广图">
+    <img class="book-cover-promo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="https://raw.githubusercontent.com/ericzhuangcoach/jingzhi-assessment/main/img3.png" alt="联合天畅推广图">
 </div>
 
 <!-- ==================== ALREADY DONE ==================== -->
@@ -1367,6 +1367,35 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+
+<script>
+// Lazy load book cover images
+(function() {
+  function loadLazy() {
+    var imgs = document.querySelectorAll('img[data-src]');
+    if (!imgs.length) return;
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            var img = e.target;
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+            io.unobserve(img);
+          }
+        });
+      }, { rootMargin: '400px 0px' });
+      imgs.forEach(function(img) { io.observe(img); });
+    } else {
+      imgs.forEach(function(img) { img.src = img.dataset.src; });
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLazy);
+  } else { loadLazy(); }
+})();
+</script>
 
 </body>
 </html>
