@@ -770,41 +770,30 @@ function resetQuiz() {
   showPage('splash');
 }
 function startQuiz() {
-  if (hasDone()) {
-    try {
-      var saved = JSON.parse(localStorage.getItem('jztf_done') || '{}');
-      if (saved.answers) { window.answers = saved.answers; window._userBg = saved.userBg || ''; showResult(); return; }
-    } catch(e) {}
-    showPage('done');
-    return;
-  }
+  window.answers = {};
+  window.currentQ = 0;
   const bgRadio = document.querySelector('input[name="userBg"]:checked');
   if (!bgRadio) {
     const area = document.querySelector('.bg-select-area');
-    const label = document.getElementById('bgLabel');
-    area.style.animation = 'shake 0.4s ease';
-    area.style.border = '2px solid #e74c3c';
-    area.style.borderRadius = '12px';
-    area.style.padding = '12px';
-    area.style.background = 'rgba(231,76,60,0.08)';
-    if (label) { label.style.color = '#e74c3c'; label.style.fontWeight = '700'; }
-    area.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => {
-      area.style.animation = '';
-      area.style.border = '';
-      area.style.borderRadius = '';
-      area.style.padding = '';
-      area.style.background = '';
-      if (label) { label.style.color = ''; label.style.fontWeight = ''; }
-    }, 2500);
+    const label = document.getElementById('bgTip') || (() => {
+      const l = document.createElement('div');
+      l.id = 'bgTip';
+      l.style.cssText = 'color:#e74c3c;font-size:13px;margin-top:8px;font-weight:bold;';
+      area.parentNode.insertBefore(l, area.nextSibling);
+      return l;
+    })();
+    label.textContent = '⚠️ 请先选择背景，再点击开始测评';
+    label.style.display = '';
+    area.style.borderColor = '#e74c3c';
+    setTimeout(() => { area.style.borderColor = ''; }, 1500);
     return;
   }
   window._userBg = bgRadio.value;
+  localStorage.removeItem('jztf_done');
   showPage('quiz');
   renderQuestion();
 }
 
-// ==================== RENDER QUESTION ====================
 function renderQuestion() {
   const q = questions[currentQ];
   const dim = DIMENSIONS[q.dimIndex];
