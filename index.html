@@ -910,28 +910,16 @@ function showResult() {
 
 // 提交数据到 Google Sheets
 function submitToGoogleSheets(scores, totalScore) {
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxboumVog6ulbvuUsLtqAXAP9mR2WN6oh2tI79egF-NDXy7Ry3B0vYF60CgYjWN7O9Ijw/exec';
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZmCdTjeLXOnp38S7_yOQE-i_MnXUt_uJVtMO6pP5YOHIoUFUwpFd1_pIvxQKX8RGh/exec';
   
-  const data = {
-    timestamp: new Date().toLocaleString('zh-CN'),
-    totalScore: totalScore,
-    scores: scores
-  };
-  
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    mode: 'no-cors', // Google Apps Script 需要 no-cors
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => {
-    console.log('数据已提交到 Google Sheets');
-  })
-  .catch(error => {
-    console.error('提交失败:', error);
-  });
+  const t = encodeURIComponent(new Date().toLocaleString('zh-CN'));
+  const params = `t=${t}&total=${totalScore}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}`;
+  const url = `${WEB_APP_URL}?${params}`;
+
+  // 用 img beacon 方式发送，完全绕过跨域限制
+  const img = new Image();
+  img.src = url;
+  console.log('数据已提交到 Google Sheets');
 }
 
 // ==================== LEVEL, ADVICE & COACH QUESTIONS ====================
