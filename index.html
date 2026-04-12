@@ -910,8 +910,8 @@ function showResult() {
 
 // 提交数据到 Google Sheets
 function submitToGoogleSheets(scores, totalScore) {
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZmCdTjeLXOnp38S7_yOQE-i_MnXUt_uJVtMO6pP5YOHIoUFUwpFd1_pIvxQKX8RGh/exec';
-  
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZmCdTjeLXOnp38S7_yOQE-i_MnXUt_uJVtMO6pP5YOHIoUFUwpFd1_pIvxQKX8RGh/exec';
+
   const t = encodeURIComponent(new Date().toLocaleString('zh-CN'));
   const params = `t=${t}&total=${totalScore}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}`;
   const url = `${WEB_APP_URL}?${params}`;
