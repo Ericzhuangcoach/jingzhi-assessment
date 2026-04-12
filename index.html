@@ -579,10 +579,9 @@
   <div id="coachSection" class="coach-section-body"></div>
 </div>
 
-<!-- 联合天畅海报 -->
+<!-- 联合天畅海报（永远在结果页最底部） -->
 <div class="book-covers-row">
   <img class="book-cover-promo" src="img3.webp" alt="联合天畅">
-</div>
 </div>
 
 <!-- ==================== ALREADY DONE ==================== -->
@@ -794,19 +793,17 @@ function startQuiz() {
     return;
   }
   
-  // 自动获取城市（IP定位）
+  // 自动获取城市（IP定位，异步但不阻塞）
   const cityInput = document.getElementById('userCity');
-  if (!cityInput.value) {
-    fetch('https://ipapi.co/json/')
-      .then(r => r.json())
-      .then(data => {
-        if (data.city) {
-          cityInput.value = data.city;
-          localStorage.setItem('quizCity', data.city);
-        }
-      })
-      .catch(() => {});
-  }
+  fetch('https://ipapi.co/json/')
+    .then(r => r.json())
+    .then(data => {
+      if (data.city) {
+        cityInput.value = data.city;
+        localStorage.setItem('quizCity', data.city);
+      }
+    })
+    .catch(() => {});
   
   const city = cityInput.value || localStorage.getItem('quizCity') || '';
   localStorage.setItem('quizName', name);
