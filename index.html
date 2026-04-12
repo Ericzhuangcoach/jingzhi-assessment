@@ -118,6 +118,10 @@
   .btn-start:active { transform: scale(0.96); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
   .splash-note { font-size: 12px; opacity: 0.6; margin-top: 20px; position: relative; }
   .bg-select-area { position: relative; width: 100%; max-width: 340px; margin: 16px auto 0; }
+  .user-info-area { width: 100%; max-width: 400px; margin: 0 auto 16px; padding: 0 16px; }
+  .user-info-row { display: flex; gap: 8px; }
+  .user-info-input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; text-align: center; }
+  .user-info-input:focus { border-color: #6366F1; outline: none; }
   .bg-select-label { font-size: 15px; font-weight: 600; color: #333333; text-align: center; margin-bottom: 10px; }
   .bg-options { display: flex; flex-direction: column; gap: 8px; }
   .bg-opt {
@@ -502,6 +506,14 @@
   <p class="splash-desc">
     本测评基于书中晶智转型模型而设计，涵盖意义构建、身心智慧、心智跃升、技能迭代、生态聚力、跨界创新六大维度，帮助你全面认识自己，并识别自己的转型优势与待发展领域。
   </p>
+  <!-- 用户信息 -->
+  <div class="user-info-area">
+    <div class="user-info-row">
+      <input type="text" id="userName" placeholder="姓名（选填）" class="user-info-input">
+      <input type="text" id="userWechat" placeholder="微信号（选填）" class="user-info-input">
+      <input type="text" id="userCity" placeholder="城市（选填）" class="user-info-input">
+    </div>
+  </div>
   <div class="bg-select-area">
     <div class="bg-select-label" id="bgLabel">请选择你的背景，再点击「开始测评」</div><div id="bgTip" style="display:none;font-size:12px;color:#e74c3c;margin-top:4px;">⚠️ 请先选择背景，再点击开始测评</div>
     <div class="bg-options">
@@ -765,6 +777,13 @@ function resetQuiz() {
   showPage('splash');
 }
 function startQuiz() {
+  // 获取用户信息
+  const name = document.getElementById('userName').value || '匿名';
+  const wechat = document.getElementById('userWechat').value || '';
+  const city = document.getElementById('userCity').value || '';
+  localStorage.setItem('quizName', name);
+  localStorage.setItem('quizWechat', wechat);
+  localStorage.setItem('quizCity', city);
   window.answers = {};
   window.currentQ = 0;
   const bgRadio = document.querySelector('input[name="userBg"]:checked');
@@ -904,16 +923,25 @@ function showResult() {
     `;
   }
 
-  // 提交数据到 Google Sheets
-  submitToGoogleSheets(displayScores, total);
+  // 提交数据到 Google Sheets（姓名、微信号、城市、综合得分放最后）
+  const name = localStorage.getItem('quizName') || '匿名';
+  const wechat = localStorage.getItem('quizWechat') || '';
+  const city = localStorage.getItem('quizCity') || '';
+  submitToGoogleSheets(displayScores, total, name, wechat, city);
 }
 
 // 提交数据到 Google Sheets
-function submitToGoogleSheets(scores, totalScore) {
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZmCdTjeLXOnp38S7_yOQE-i_MnXUt_uJVtMO6pP5YOHIoUFUwpFd1_pIvxQKX8RGh/exec';
+// 列顺序：姓名、微信号、城市、时间、意义构建、身心智慧、心智跃升、技能迭代、生态聚力、跨界创新、综合得分
+function submitToGoogleSheets(scores, totalScore, name, wechat, city) {
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZmCdTjeLXOnp38S7_yOQE-i_MnXUt_uJVtMO6pP5YOHIoUFUwpFd1_pIvxQKX8RGh/exec';
 
   const t = encodeURIComponent(new Date().toLocaleString('zh-CN'));
-  const params = `t=${t}&total=${totalScore}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}`;
+  const nameEncoded = encodeURIComponent(name || '匿名');
+  const wechatEncoded = encodeURIComponent(wechat || '');
+  const cityEncoded = encodeURIComponent(city || '');
+  
+  // s0=意义构建, s1=身心智慧, s2=心智跃升, s3=技能迭代, s4=生态聚力, s5=跨界创新, total=综合得分(最后)
+  const params = `name=${nameEncoded}&wechat=${wechatEncoded}&city=${cityEncoded}&t=${t}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}&total=${totalScore}`;
   const url = `${WEB_APP_URL}?${params}`;
 
   // 用 img beacon 方式发送，完全绕过跨域限制
