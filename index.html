@@ -509,10 +509,10 @@
   <!-- 用户信息 -->
   <div class="user-info-area">
     <div class="user-info-row">
-      <input type="text" id="userName" placeholder="姓名（选填）" class="user-info-input">
-      <input type="text" id="userWechat" placeholder="微信号（选填）" class="user-info-input">
-      <input type="text" id="userCity" placeholder="城市（选填）" class="user-info-input">
+      <input type="text" id="userName" placeholder="姓名（必填）" class="user-info-input" style="flex:1">
+      <input type="text" id="userCity" placeholder="城市" class="user-info-input" style="flex:1" readonly>
     </div>
+    <div id="nameTip" style="display:none;font-size:12px;color:#e74c3c;margin-top:4px;text-align:center;">⚠️ 请输入您的姓名</div>
   </div>
   <div class="bg-select-area">
     <div class="bg-select-label" id="bgLabel">请选择你的背景，再点击「开始测评」</div><div id="bgTip" style="display:none;font-size:12px;color:#e74c3c;margin-top:4px;">⚠️ 请先选择背景，再点击开始测评</div>
@@ -777,12 +777,39 @@ function resetQuiz() {
   showPage('splash');
 }
 function startQuiz() {
-  // 获取用户信息
-  const name = document.getElementById('userName').value || '匿名';
-  const wechat = document.getElementById('userWechat').value || '';
-  const city = document.getElementById('userCity').value || '';
+  // 获取姓名（必填）
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    const tip = document.getElementById('nameTip') || (() => {
+      const t = document.createElement('div');
+      t.id = 'nameTip';
+      t.style.cssText = 'font-size:12px;color:#e74c3c;margin-top:4px;text-align:center;';
+      document.querySelector('.user-info-area').appendChild(t);
+      return t;
+    })();
+    tip.textContent = '⚠️ 请输入您的姓名';
+    tip.style.display = '';
+    document.getElementById('userName').style.borderColor = '#e74c3c';
+    setTimeout(() => { document.getElementById('userName').style.borderColor = ''; }, 2000);
+    return;
+  }
+  
+  // 自动获取城市（IP定位）
+  const cityInput = document.getElementById('userCity');
+  if (!cityInput.value) {
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.city) {
+          cityInput.value = data.city;
+          localStorage.setItem('quizCity', data.city);
+        }
+      })
+      .catch(() => {});
+  }
+  
+  const city = cityInput.value || localStorage.getItem('quizCity') || '';
   localStorage.setItem('quizName', name);
-  localStorage.setItem('quizWechat', wechat);
   localStorage.setItem('quizCity', city);
   window.answers = {};
   window.currentQ = 0;
@@ -923,25 +950,23 @@ function showResult() {
     `;
   }
 
-  // 提交数据到 Google Sheets（姓名、微信号、城市、综合得分放最后）
+  // 提交数据到 Google Sheets（姓名、城市、时间、维度分数、综合得分）
   const name = localStorage.getItem('quizName') || '匿名';
-  const wechat = localStorage.getItem('quizWechat') || '';
   const city = localStorage.getItem('quizCity') || '';
-  submitToGoogleSheets(displayScores, total, name, wechat, city);
+  submitToGoogleSheets(displayScores, total, name, city);
 }
 
 // 提交数据到 Google Sheets
-// 列顺序：姓名、微信号、城市、时间、意义构建、身心智慧、心智跃升、技能迭代、生态聚力、跨界创新、综合得分
-function submitToGoogleSheets(scores, totalScore, name, wechat, city) {
+// 列顺序：姓名、城市、时间、意义构建、身心智慧、心智跃升、技能迭代、生态聚力、跨界创新、综合得分
+function submitToGoogleSheets(scores, totalScore, name, city) {
   const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_LhFCRPVaAb_dYoqSOzctJ98mWkG8soMldW_swOeKJAG00ZtV9FJgH-V0nA4HOAg/exec';
 
   const t = encodeURIComponent(new Date().toLocaleString('zh-CN'));
   const nameEncoded = encodeURIComponent(name || '匿名');
-  const wechatEncoded = encodeURIComponent(wechat || '');
   const cityEncoded = encodeURIComponent(city || '');
   
   // s0=意义构建, s1=身心智慧, s2=心智跃升, s3=技能迭代, s4=生态聚力, s5=跨界创新, total=综合得分(最后)
-  const params = `name=${nameEncoded}&wechat=${wechatEncoded}&city=${cityEncoded}&t=${t}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}&total=${totalScore}`;
+  const params = `name=${nameEncoded}&city=${cityEncoded}&t=${t}&s0=${scores[0]}&s1=${scores[1]}&s2=${scores[2]}&s3=${scores[3]}&s4=${scores[4]}&s5=${scores[5]}&total=${totalScore}`;
   const url = `${WEB_APP_URL}?${params}`;
 
   // 用 img beacon 方式发送，完全绕过跨域限制
